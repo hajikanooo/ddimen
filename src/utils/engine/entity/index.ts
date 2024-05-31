@@ -18,7 +18,9 @@ export class DDEntity {
   getComponent<T extends DDComponent>(
     type: new (...args: any[]) => T,
   ): T | undefined {
-    return this.components.find(comp => comp instanceof type) as T | undefined;
+    return this.components.find(
+      comp => comp instanceof type,
+    ) as T | undefined;
   }
 
   update(delta: number): void {

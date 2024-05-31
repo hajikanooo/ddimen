@@ -4,7 +4,9 @@ import { DDComponent } from '../component';
 import { DDEntity } from '../entity';
 import { DDSpriteComponent } from '../sprite';
 
-type TransformUpdateCallback<T extends DDComponent = DDComponent> = (
+type TransformUpdateCallback<
+  T extends DDComponent = DDComponent,
+> = (
   transformComp: DDTransformComponent,
   source?: new (...args: any[]) => T,
 ) => void;
@@ -41,7 +43,9 @@ export class DDTransformComponent extends DDComponent {
   }
 
   get screenPostion(): Vector {
-    const spriteComp = this.entity.getComponent(DDSpriteComponent);
+    const spriteComp = this.entity.getComponent(
+      DDSpriteComponent,
+    );
     if (!spriteComp) {
       return this.position;
     }
@@ -58,7 +62,9 @@ export class DDTransformComponent extends DDComponent {
     );
   }
 
-  reigsterUpdateNotifyCb(callback: TransformUpdateCallback): void {
+  reigsterUpdateNotifyCb(
+    callback: TransformUpdateCallback,
+  ): void {
     this.updateCallbacks.push(callback);
   }
 

@@ -24,7 +24,9 @@ export class DDPhysicsComponent extends DDComponent {
   }
 
   get entityPosition() {
-    const transformComp = this.entity.getComponent(DDTransformComponent);
+    const transformComp = this.entity.getComponent(
+      DDTransformComponent,
+    );
     if (!transformComp) {
       throw new Error('transformComponent is undefined!');
     }
@@ -32,21 +34,27 @@ export class DDPhysicsComponent extends DDComponent {
   }
 
   initListeners() {
-    const transformComp = this.entity.getComponent(DDTransformComponent);
+    const transformComp = this.entity.getComponent(
+      DDTransformComponent,
+    );
     if (!transformComp) {
       return;
     }
-    transformComp.reigsterUpdateNotifyCb(({ position, rotation }, source) => {
-      if (source instanceof DDPhysicsComponent) {
-        return;
-      }
-      Body.setPosition(this.body, position);
-      Body.setAngle(this.body, rotation);
-    });
+    transformComp.reigsterUpdateNotifyCb(
+      ({ position, rotation }, source) => {
+        if (source instanceof DDPhysicsComponent) {
+          return;
+        }
+        Body.setPosition(this.body, position);
+        Body.setAngle(this.body, rotation);
+      },
+    );
   }
 
   update(_delta: number): void {
-    const transformComp = this.entity.getComponent(DDTransformComponent);
+    const transformComp = this.entity.getComponent(
+      DDTransformComponent,
+    );
     if (!transformComp) {
       return;
     }

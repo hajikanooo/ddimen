@@ -9,7 +9,9 @@ import { initApp } from '@/utils/engine';
 
 const Index = () => {
   const appRef = useRef<Application | null>(null);
-  const entityManagerRef = useRef<DDEntityManager | null>(null);
+  const entityManagerRef = useRef<DDEntityManager | null>(
+    null,
+  );
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -18,7 +20,9 @@ const Index = () => {
       if (!target) {
         return;
       }
-      const transformComp = target.getComponent(DDTransformComponent);
+      const transformComp = target.getComponent(
+        DDTransformComponent,
+      );
       if (!transformComp) {
         return;
       }
@@ -45,14 +49,18 @@ const Index = () => {
   }, []);
 
   return (
-    <Center className={classNames(styles.ctn, 'w-full h-full')}>
+    <Center
+      className={classNames(styles.ctn, 'w-full h-full')}
+    >
       <Box
         className={classNames(styles.canvasCtn)}
         ref={async el => {
           if (!el) {
             return;
           }
-          const { app, entityManager } = await initApp({ ctn: el });
+          const { app, entityManager } = await initApp({
+            ctn: el,
+          });
           appRef.current = app;
           entityManagerRef.current = entityManager;
         }}

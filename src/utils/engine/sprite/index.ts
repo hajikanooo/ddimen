@@ -27,15 +27,19 @@ export class DDSpriteComponent extends DDComponent {
   }
 
   initListeners(): boolean {
-    const transformComp = this.entity.getComponent(DDTransformComponent);
+    const transformComp = this.entity.getComponent(
+      DDTransformComponent,
+    );
     if (!transformComp) {
       return false;
     }
-    transformComp.reigsterUpdateNotifyCb(({ position, rotation, scale }) => {
-      this.sprite.position.set(position.x, position.y);
-      this.sprite.rotation = rotation;
-      this.sprite.scale = scale;
-    });
+    transformComp.reigsterUpdateNotifyCb(
+      ({ position, rotation, scale }) => {
+        this.sprite.position.set(position.x, position.y);
+        this.sprite.rotation = rotation;
+        this.sprite.scale = scale;
+      },
+    );
     return true;
   }
 

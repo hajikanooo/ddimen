@@ -37,14 +37,20 @@ export class VirtualCamera {
     if (!this.followTarget) {
       return;
     }
-    const transformComp = this.followTarget.getComponent(DDTransformComponent);
+    const transformComp = this.followTarget.getComponent(
+      DDTransformComponent,
+    );
     if (!transformComp) {
       return;
     }
     const targetX =
-      transformComp.screenPostion.x + this.offsetX - this.app.screen.width / 2;
+      transformComp.screenPostion.x +
+      this.offsetX -
+      this.app.screen.width / 2;
     const targetY =
-      transformComp.screenPostion.y + this.offsetY - this.app.screen.height / 2;
+      transformComp.screenPostion.y +
+      this.offsetY -
+      this.app.screen.height / 2;
 
     this.viewport.x = -(targetX - this.viewport.x);
     this.viewport.y = -(targetY - this.viewport.y);

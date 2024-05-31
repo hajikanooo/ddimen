@@ -1,4 +1,9 @@
-import { Application, Assets, Sprite, Ticker } from 'pixi.js';
+import {
+  Application,
+  Assets,
+  Sprite,
+  Ticker,
+} from 'pixi.js';
 import { Engine, Vector } from 'matter-js';
 import machi_chann_idle_00 from 'config/public/images/characters/machi_chann/idle_00.png';
 import classroom_back from 'config/public/images/maps/classroom/classroom_back.png';
@@ -31,7 +36,11 @@ export function pixiSetTimeout({
   ticker.add(tick);
 }
 
-export async function initApp({ ctn }: { ctn: HTMLElement }) {
+export async function initApp({
+  ctn,
+}: {
+  ctn: HTMLElement;
+}) {
   const entityManager = new DDEntityManager();
   // @ts-expect-error entityManager
   window.entityManager = entityManager;
@@ -40,7 +49,11 @@ export async function initApp({ ctn }: { ctn: HTMLElement }) {
   // @ts-expect-error __PIXI_APP__
   window.__PIXI_APP__ = app;
 
-  await app.init({ background: '#000', resizeTo: ctn });
+  await app.init({
+    background: '#000',
+    resizeTo: ctn,
+    autoStart: false,
+  });
   ctn.innerHTML = '';
   ctn.appendChild(app.canvas);
 
@@ -77,7 +90,9 @@ export async function initApp({ ctn }: { ctn: HTMLElement }) {
   spriteComponent.sprite.anchor.set(0.5);
   spriteComponent.sprite.on('pointerdown', () => {
     const transformComp =
-      spriteComponent.entity.getComponent(DDTransformComponent);
+      spriteComponent.entity.getComponent(
+        DDTransformComponent,
+      );
     if (!transformComp) {
       return;
     }
@@ -113,21 +128,32 @@ export async function initApp({ ctn }: { ctn: HTMLElement }) {
   });
   entity.addComponent(physicsComponent);
 
-  transformComponent.notifyUpdate({ source: DDTransformComponent });
+  transformComponent.notifyUpdate({
+    source: DDTransformComponent,
+  });
 
-  const textureClassRoomBack = await Assets.load(classroom_back);
-  const textureClassRoomFront = await Assets.load(classroom_front);
+  const textureClassRoomBack = await Assets.load(
+    classroom_back,
+  );
+  const textureClassRoomFront = await Assets.load(
+    classroom_front,
+  );
   const spriteBack = new Sprite(textureClassRoomBack);
   const spriteFront = new Sprite(textureClassRoomFront);
 
   const scale = 0.35;
-  transformComponent.setScale({ scaleX: scale, scaleY: scale });
+  transformComponent.setScale({
+    scaleX: scale,
+    scaleY: scale,
+  });
 
   app.stage.addChild(spriteBack);
   app.stage.addChild(spriteComponent.sprite);
   app.stage.addChild(spriteFront);
 
-  const camera = new VirtualCamera({ app });
+  const camera = new VirtualCamera({
+    app,
+  });
   camera.followTarget = entity;
 
   // @ts-expect-error camera
