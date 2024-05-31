@@ -12,7 +12,7 @@ export class DDSpriteComponent extends DDComponent {
     texture,
     options,
   }: {
-    ctn: Container;
+    ctn?: Container;
     entity: DDEntity;
     texture: Texture;
     options?: Partial<Sprite>;
@@ -20,7 +20,7 @@ export class DDSpriteComponent extends DDComponent {
     super({ entity });
     this.sprite = new Sprite(texture);
     Object.assign(this.sprite, options);
-    ctn.addChild(this.sprite);
+    ctn?.addChild(this.sprite);
     this.initListeners();
   }
 
@@ -29,9 +29,10 @@ export class DDSpriteComponent extends DDComponent {
     if (!transformComp) {
       return;
     }
-    transformComp.reigsterUpdateNotifyCb(({ position, angle }) => {
+    transformComp.reigsterUpdateNotifyCb(({ position, rotation, scale }) => {
       this.sprite.position.set(position.x, position.y);
-      this.sprite.rotation = angle;
+      this.sprite.rotation = rotation;
+      this.sprite.scale = scale;
     });
   }
 }

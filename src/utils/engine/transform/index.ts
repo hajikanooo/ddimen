@@ -1,4 +1,5 @@
 import { Vector } from 'matter-js';
+import { Point } from 'pixi.js';
 import { DDComponent } from '../component';
 import { DDEntity } from '../entity';
 
@@ -10,7 +11,9 @@ type TransformUpdateCallback<T extends DDComponent = DDComponent> = (
 export class DDTransformComponent extends DDComponent {
   position: Vector;
 
-  angle: number;
+  scale: Point;
+
+  rotation: number;
 
   private updateCallbacks: TransformUpdateCallback[];
 
@@ -18,16 +21,21 @@ export class DDTransformComponent extends DDComponent {
     entity,
     x,
     y,
-    angle = 0,
+    rotation = 0,
+    scaleX = 1,
+    scaleY = 1,
   }: {
     entity: DDEntity;
     x: number;
     y: number;
-    angle?: number;
+    rotation?: number;
+    scaleX?: number;
+    scaleY?: number;
   }) {
     super({ entity });
     this.position = Vector.create(x, y);
-    this.angle = angle;
+    this.scale = new Point(scaleX, scaleY);
+    this.rotation = rotation;
     this.updateCallbacks = [];
   }
 
@@ -49,14 +57,27 @@ export class DDTransformComponent extends DDComponent {
     this.notifyUpdate({ source });
   }
 
-  setAngle<T extends DDComponent>({
-    angle,
+  setScale<T extends DDComponent>({
+    scaleX = 1,
+    scaleY = 1,
     source,
   }: {
-    angle: number;
+    scaleX?: number;
+    scaleY?: number;
     source?: new (...args: any[]) => T;
   }): void {
-    this.angle = angle;
+    this.scale.set(scaleX, scaleY);
+    this.notifyUpdate({ source });
+  }
+
+  setRotation<T extends DDComponent>({
+    rotation,
+    source,
+  }: {
+    rotation: number;
+    source?: new (...args: any[]) => T;
+  }): void {
+    this.rotation = rotation;
     this.notifyUpdate({ source });
   }
 

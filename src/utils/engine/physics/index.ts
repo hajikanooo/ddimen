@@ -36,12 +36,12 @@ export class DDPhysicsComponent extends DDComponent {
     if (!transformComp) {
       return;
     }
-    transformComp.reigsterUpdateNotifyCb(({ position, angle }, source) => {
+    transformComp.reigsterUpdateNotifyCb(({ position, rotation }, source) => {
       if (source instanceof DDPhysicsComponent) {
         return;
       }
       Body.setPosition(this.body, position);
-      Body.setAngle(this.body, angle);
+      Body.setAngle(this.body, rotation);
     });
   }
 
@@ -55,8 +55,8 @@ export class DDPhysicsComponent extends DDComponent {
       y: this.body.position.y,
       source: DDPhysicsComponent,
     });
-    transformComp.setAngle({
-      angle: this.body.angle,
+    transformComp.setRotation({
+      rotation: this.body.angle,
       source: DDPhysicsComponent,
     });
   }

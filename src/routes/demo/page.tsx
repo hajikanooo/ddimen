@@ -1,9 +1,11 @@
 import { Box, Center } from '@chakra-ui/react';
 import { Application } from 'pixi.js';
 import { useEffect, useRef } from 'react';
-import { initApp } from '@/utils/engine';
+import classNames from 'classnames';
+import styles from './index.module.scss';
 import { DDEntityManager } from '@/utils/engine/entity';
 import { DDTransformComponent } from '@/utils/engine/transform';
+import { initApp } from '@/utils/engine';
 
 const Index = () => {
   const appRef = useRef<Application | null>(null);
@@ -21,7 +23,7 @@ const Index = () => {
         return;
       }
       const { x, y } = transformComp.position;
-      const step = 30;
+      const step = 10;
       if (e.key === 'w') {
         transformComp.setPosition({ x, y: y - step });
       }
@@ -43,19 +45,18 @@ const Index = () => {
   }, []);
 
   return (
-    <Center className="w-full h-full">
-      <Box>
-        <div
-          ref={async el => {
-            if (!el) {
-              return;
-            }
-            const { app, entityManager } = await initApp({ ctn: el });
-            appRef.current = app;
-            entityManagerRef.current = entityManager;
-          }}
-        />
-      </Box>
+    <Center className={classNames(styles.ctn, 'w-full h-full')}>
+      <Box
+        className={classNames(styles.canvasCtn)}
+        ref={async el => {
+          if (!el) {
+            return;
+          }
+          const { app, entityManager } = await initApp({ ctn: el });
+          appRef.current = app;
+          entityManagerRef.current = entityManager;
+        }}
+      />
     </Center>
   );
 };
