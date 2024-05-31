@@ -6,6 +6,8 @@ import { DDTransformComponent } from '../transform';
 export class DDSpriteComponent extends DDComponent {
   sprite: Sprite;
 
+  transformInitOk: boolean = false;
+
   constructor({
     ctn,
     entity,
@@ -24,15 +26,22 @@ export class DDSpriteComponent extends DDComponent {
     this.initListeners();
   }
 
-  initListeners() {
+  initListeners(): boolean {
     const transformComp = this.entity.getComponent(DDTransformComponent);
     if (!transformComp) {
-      return;
+      return false;
     }
     transformComp.reigsterUpdateNotifyCb(({ position, rotation, scale }) => {
       this.sprite.position.set(position.x, position.y);
       this.sprite.rotation = rotation;
       this.sprite.scale = scale;
     });
+    return true;
+  }
+
+  update(_delta: number): void {
+    if (!this.transformInitOk) {
+      this.initListeners();
+    }
   }
 }

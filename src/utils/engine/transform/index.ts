@@ -2,6 +2,7 @@ import { Vector } from 'matter-js';
 import { Point } from 'pixi.js';
 import { DDComponent } from '../component';
 import { DDEntity } from '../entity';
+import { DDSpriteComponent } from '../sprite';
 
 type TransformUpdateCallback<T extends DDComponent = DDComponent> = (
   transformComp: DDTransformComponent,
@@ -37,6 +38,15 @@ export class DDTransformComponent extends DDComponent {
     this.scale = new Point(scaleX, scaleY);
     this.rotation = rotation;
     this.updateCallbacks = [];
+  }
+
+  get worldPosition(): Vector {
+    const spriteComp = this.entity.getComponent(DDSpriteComponent);
+    if (!spriteComp) {
+      return this.position;
+    }
+    const { tx, ty } = spriteComp.sprite.worldTransform;
+    return Vector.create(tx, ty);
   }
 
   reigsterUpdateNotifyCb(callback: TransformUpdateCallback): void {
@@ -81,7 +91,7 @@ export class DDTransformComponent extends DDComponent {
     this.notifyUpdate({ source });
   }
 
-  private notifyUpdate<T extends DDComponent>({
+  notifyUpdate<T extends DDComponent>({
     source,
   }: {
     source?: new (...args: any[]) => T;

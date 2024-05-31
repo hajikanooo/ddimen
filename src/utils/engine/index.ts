@@ -1,4 +1,4 @@
-import { Application, Assets, Sprite, Ticker } from 'pixi.js';
+import { Application, Assets, Container, Sprite, Ticker } from 'pixi.js';
 import { Engine, Vector } from 'matter-js';
 import machi_chann_idle_00 from 'config/public/images/characters/machi_chann/idle_00.png';
 import classroom_back from 'config/public/images/maps/classroom/classroom_back.png';
@@ -7,6 +7,7 @@ import { DDEntityManager } from './entity';
 import { DDTransformComponent } from './transform';
 import { DDSpriteComponent } from './sprite';
 import { DDPhysicsComponent } from './physics';
+import { VirtualCamera } from './camera';
 
 export function pixiSetTimeout({
   ticker,
@@ -30,6 +31,38 @@ export function pixiSetTimeout({
   ticker.add(tick);
 }
 
+export async function addMachi({
+  entityManager,
+  ctn,
+  initPosition = Vector.create(0, 0),
+}: {
+  entityManager: DDEntityManager;
+  ctn: Container;
+  initPosition?: Vector;
+}) {
+  const entity = entityManager.createEntity();
+  const texture = await Assets.load(machi_chann_idle_00);
+  const spriteComponent = new DDSpriteComponent({
+    ctn,
+    entity,
+    texture,
+    options: {
+      eventMode: 'static',
+      cursor: 'pointer',
+    },
+  });
+
+  entity.addComponent(spriteComponent);
+
+  const transformComponent = new DDTransformComponent({
+    entity,
+    x: initPosition.x,
+    y: initPosition.y,
+  });
+  entity.addComponent(transformComponent);
+  return entity;
+}
+
 export async function initApp({ ctn }: { ctn: HTMLElement }) {
   const entityManager = new DDEntityManager();
 
@@ -37,7 +70,7 @@ export async function initApp({ ctn }: { ctn: HTMLElement }) {
   // @ts-expect-error __PIXI_APP__
   globalThis.__PIXI_APP__ = app;
 
-  await app.init({ background: '#aaa', resizeTo: ctn });
+  await app.init({ background: '#000', resizeTo: ctn });
   ctn.innerHTML = '';
   ctn.appendChild(app.canvas);
 
@@ -72,7 +105,6 @@ export async function initApp({ ctn }: { ctn: HTMLElement }) {
     },
   });
   spriteComponent.sprite.anchor.set(0.5);
-  entity.addComponent(spriteComponent);
   spriteComponent.sprite.on('pointerdown', () => {
     const transformComp =
       spriteComponent.entity.getComponent(DDTransformComponent);
@@ -103,6 +135,7 @@ export async function initApp({ ctn }: { ctn: HTMLElement }) {
       },
     });
   });
+  entity.addComponent(spriteComponent);
 
   const physicsComponent = new DDPhysicsComponent({
     entity,
@@ -110,10 +143,7 @@ export async function initApp({ ctn }: { ctn: HTMLElement }) {
   });
   entity.addComponent(physicsComponent);
 
-  app.ticker.add(ticker => {
-    Engine.update(physicsEngine, ticker.deltaMS);
-    entityManager.update(ticker.deltaMS);
-  });
+  transformComponent.notifyUpdate({ source: DDTransformComponent });
 
   const textureClassRoomBack = await Assets.load(classroom_back);
   const textureClassRoomFront = await Assets.load(classroom_front);
@@ -126,6 +156,20 @@ export async function initApp({ ctn }: { ctn: HTMLElement }) {
   app.stage.addChild(spriteBack);
   app.stage.addChild(spriteComponent.sprite);
   app.stage.addChild(spriteFront);
+
+  const camera = new VirtualCamera({ app });
+  camera.followTarget = entity;
+
+  // @ts-expect-error xxxxxx
+  window.camera = camera;
+
+  app.render();
+
+  app.ticker.add(ticker => {
+    camera.update();
+    Engine.update(physicsEngine, ticker.deltaMS);
+    entityManager.update(ticker.deltaMS);
+  });
 
   return { app, entityManager };
 }
