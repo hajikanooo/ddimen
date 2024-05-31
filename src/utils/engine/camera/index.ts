@@ -42,9 +42,9 @@ export class VirtualCamera {
       return;
     }
     const targetX =
-      transformComp.worldPosition.x + this.offsetX - this.app.screen.width / 2;
+      transformComp.screenPostion.x + this.offsetX - this.app.screen.width / 2;
     const targetY =
-      transformComp.worldPosition.y + this.offsetY - this.app.screen.height / 2;
+      transformComp.screenPostion.y + this.offsetY - this.app.screen.height / 2;
 
     this.viewport.x = -(targetX - this.viewport.x);
     this.viewport.y = -(targetY - this.viewport.y);

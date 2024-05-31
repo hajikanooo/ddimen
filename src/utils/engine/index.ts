@@ -1,4 +1,4 @@
-import { Application, Assets, Container, Sprite, Ticker } from 'pixi.js';
+import { Application, Assets, Sprite, Ticker } from 'pixi.js';
 import { Engine, Vector } from 'matter-js';
 import machi_chann_idle_00 from 'config/public/images/characters/machi_chann/idle_00.png';
 import classroom_back from 'config/public/images/maps/classroom/classroom_back.png';
@@ -31,44 +31,14 @@ export function pixiSetTimeout({
   ticker.add(tick);
 }
 
-export async function addMachi({
-  entityManager,
-  ctn,
-  initPosition = Vector.create(0, 0),
-}: {
-  entityManager: DDEntityManager;
-  ctn: Container;
-  initPosition?: Vector;
-}) {
-  const entity = entityManager.createEntity();
-  const texture = await Assets.load(machi_chann_idle_00);
-  const spriteComponent = new DDSpriteComponent({
-    ctn,
-    entity,
-    texture,
-    options: {
-      eventMode: 'static',
-      cursor: 'pointer',
-    },
-  });
-
-  entity.addComponent(spriteComponent);
-
-  const transformComponent = new DDTransformComponent({
-    entity,
-    x: initPosition.x,
-    y: initPosition.y,
-  });
-  entity.addComponent(transformComponent);
-  return entity;
-}
-
 export async function initApp({ ctn }: { ctn: HTMLElement }) {
   const entityManager = new DDEntityManager();
+  // @ts-expect-error entityManager
+  window.entityManager = entityManager;
 
   const app = new Application();
   // @ts-expect-error __PIXI_APP__
-  globalThis.__PIXI_APP__ = app;
+  window.__PIXI_APP__ = app;
 
   await app.init({ background: '#000', resizeTo: ctn });
   ctn.innerHTML = '';
@@ -80,7 +50,7 @@ export async function initApp({ ctn }: { ctn: HTMLElement }) {
     },
   });
   const { world } = physicsEngine;
-  const entity = entityManager.createEntity();
+  const entity = entityManager.createEntity({ app });
 
   const initPosition = Vector.create(
     app.screen.width / 2,
@@ -160,7 +130,7 @@ export async function initApp({ ctn }: { ctn: HTMLElement }) {
   const camera = new VirtualCamera({ app });
   camera.followTarget = entity;
 
-  // @ts-expect-error xxxxxx
+  // @ts-expect-error camera
   window.camera = camera;
 
   app.render();

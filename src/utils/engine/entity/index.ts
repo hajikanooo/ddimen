@@ -1,10 +1,14 @@
+import { Application } from 'pixi.js';
 import { DDComponent } from '../component';
 
 export class DDEntity {
   components: DDComponent[];
 
-  constructor() {
+  app: Application;
+
+  constructor({ app }: { app: Application }) {
     this.components = [];
+    this.app = app;
   }
 
   addComponent(component: DDComponent): void {
@@ -33,8 +37,8 @@ export class DDEntityManager {
     this.entities = [];
   }
 
-  createEntity(): DDEntity {
-    const entity = new DDEntity();
+  createEntity({ app }: { app: Application }): DDEntity {
+    const entity = new DDEntity({ app });
     this.entities.push(entity);
     return entity;
   }

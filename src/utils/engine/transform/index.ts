@@ -40,13 +40,22 @@ export class DDTransformComponent extends DDComponent {
     this.updateCallbacks = [];
   }
 
-  get worldPosition(): Vector {
+  get screenPostion(): Vector {
     const spriteComp = this.entity.getComponent(DDSpriteComponent);
     if (!spriteComp) {
       return this.position;
     }
     const { tx, ty } = spriteComp.sprite.worldTransform;
     return Vector.create(tx, ty);
+  }
+
+  get worldPosition(): Vector {
+    const { entity, screenPostion } = this;
+    const { app } = entity;
+    return Vector.create(
+      screenPostion.x - app.stage.x,
+      screenPostion.y - app.stage.y,
+    );
   }
 
   reigsterUpdateNotifyCb(callback: TransformUpdateCallback): void {
