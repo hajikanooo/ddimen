@@ -12,6 +12,8 @@ export class DDMovementComponent extends DDComponent {
 
   keyDownSet: Set<string> = new Set();
 
+  specialKeyDownSet: Set<string> = new Set();
+
   baseSpeed: number = 1;
 
   running: boolean = false;
@@ -23,54 +25,71 @@ export class DDMovementComponent extends DDComponent {
     this.initListeners();
   }
 
-  isKeyPressed(key: string) {
+  hasShift(e: KeyboardEvent): boolean {
+    return e.shiftKey || e.key.toLowerCase() === 'shift';
+  }
+
+  isKeyDown(key: string): boolean {
     const { keyDownSet } = this;
     return keyDownSet.has(key);
   }
 
   onKeyDown = (e: KeyboardEvent) => {
-    const { keyDownSet } = this;
+    const { keyDownSet, specialKeyDownSet } = this;
     const key = e.key.toLowerCase();
     if (DDMovementComponent.KEY_SETS.has(key)) {
       keyDownSet.add(key);
     }
-    if (e.shiftKey) {
+    if (
+      this.hasShift(e) &&
+      !specialKeyDownSet.has('shift')
+    ) {
+      specialKeyDownSet.add('shift');
       this.running = !this.running;
     }
     return this;
   };
 
   onKeyUp = (e: KeyboardEvent) => {
-    const { keyDownSet } = this;
+    const { keyDownSet, specialKeyDownSet } = this;
     const key = e.key.toLowerCase();
     if (DDMovementComponent.KEY_SETS.has(key)) {
       keyDownSet.delete(key);
+    }
+    if (
+      this.hasShift(e) &&
+      specialKeyDownSet.has('shift')
+    ) {
+      specialKeyDownSet.delete('shift');
     }
     return this;
   };
 
   get direction(): Vector {
     const dir = Vector.create(0, 0);
-    if (this.isKeyPressed('w')) {
+    if (this.isKeyDown('w')) {
       dir.y -= 1;
     }
-    if (this.isKeyPressed('s')) {
+    if (this.isKeyDown('s')) {
       dir.y += 1;
     }
-    if (this.isKeyPressed('a')) {
+    if (this.isKeyDown('a')) {
       dir.x -= 1;
     }
-    if (this.isKeyPressed('d')) {
+    if (this.isKeyDown('d')) {
       dir.x += 1;
     }
     return dir;
   }
 
   get speed(): number {
-    const { baseSpeed, runningScale } = this;
+    const { baseSpeed, runningScale, keyDownSet } = this;
     let speed = baseSpeed;
     if (this.running) {
       speed *= runningScale;
+    }
+    if (keyDownSet.size > 1) {
+      speed *= 0.6;
     }
     return speed;
   }
@@ -82,7 +101,7 @@ export class DDMovementComponent extends DDComponent {
     return true;
   }
 
-  movement() {
+  movement(): void {
     const { direction, speed } = this;
     const magnitude = Vector.magnitude(direction);
     if (!magnitude) {
