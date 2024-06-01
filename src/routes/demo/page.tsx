@@ -1,16 +1,19 @@
 import { Box, Center } from '@chakra-ui/react';
-import { Application } from 'pixi.js';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import styles from './index.module.scss';
-import { DDEntityManager } from '@/utils/engine/entity';
-import { initApp } from '@/utils/engine';
+import { DDGameController } from '@/utils/engine/game_controller';
 
 const Index = () => {
-  const appRef = useRef<Application | null>(null);
-  const entityManagerRef = useRef<DDEntityManager | null>(
+  const controllerRef = useRef<DDGameController | null>(
     null,
   );
+
+  useEffect(() => {
+    return () => {
+      controllerRef.current?.destroy();
+    };
+  }, []);
 
   return (
     <Center
@@ -22,11 +25,16 @@ const Index = () => {
           if (!el) {
             return;
           }
-          const { app, entityManager } = await initApp({
+          const controller = new DDGameController({
             ctn: el,
           });
-          appRef.current = app;
-          entityManagerRef.current = entityManager;
+          controllerRef.current = controller;
+          await controller.init();
+          await controller.addBackground();
+          const player = await controller.addPlayer();
+          controller
+            .setMainCameraFollow({ entity: player })
+            .start();
         }}
       />
     </Center>

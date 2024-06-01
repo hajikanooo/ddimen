@@ -30,6 +30,14 @@ export class DDEntity {
       }
     });
   }
+
+  destroy(): void {
+    this.components.forEach(comp => {
+      if (comp.enabled) {
+        comp.destroy();
+      }
+    });
+  }
 }
 
 export class DDEntityManager {
@@ -47,5 +55,11 @@ export class DDEntityManager {
 
   update(delta: number): void {
     this.entities.forEach(entity => entity.update(delta));
+  }
+
+  destroy() {
+    this.entities.forEach(entity => {
+      entity.destroy();
+    });
   }
 }
