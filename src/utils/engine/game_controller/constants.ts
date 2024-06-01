@@ -1,0 +1,1 @@
+export const MAIN_CAMEAR_LABEL = 'MAIN_CAMEAR_LABEL';

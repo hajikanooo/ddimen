@@ -16,6 +16,7 @@ import { DDSpriteComponent } from '../components/sprite';
 import { DDPhysicsComponent } from '../components/physics';
 import { DDMovementComponent } from '../components/movement';
 import { IDDControllerHooks } from './typing';
+import { MAIN_CAMEAR_LABEL } from './constants';
 
 export class DDGameController {
   ctn: HTMLElement;
@@ -54,6 +55,7 @@ export class DDGameController {
     });
     this.mainCamera = new VirtualCamera({
       app: this.app,
+      label: MAIN_CAMEAR_LABEL,
     });
 
     this.devModeInit();
@@ -138,6 +140,11 @@ export class DDGameController {
     return this;
   }
 
+  addObjectToScene(sprite: Sprite) {
+    const { mainCamera } = this;
+    mainCamera.viewport.addChild(sprite);
+  }
+
   async addPlayer(): Promise<DDEntity> {
     const { entityManager, app, physicsEngine } = this;
 
@@ -169,6 +176,7 @@ export class DDGameController {
       },
     });
     spriteComponent.sprite.anchor.set(0.5);
+    spriteComponent.sprite.zIndex = 1;
     entity.addComponent(spriteComponent);
 
     const physicsComponent = new DDPhysicsComponent({
@@ -186,13 +194,12 @@ export class DDGameController {
       source: DDTransformComponent,
     });
 
-    app.stage.addChild(spriteComponent.sprite);
+    this.addObjectToScene(spriteComponent.sprite);
 
     return entity;
   }
 
   async addBackground(): Promise<void> {
-    const { app } = this;
     const textureClassRoomBack = await Assets.load(
       classroom_back,
     );
@@ -200,8 +207,11 @@ export class DDGameController {
       classroom_front,
     );
     const spriteBack = new Sprite(textureClassRoomBack);
+    spriteBack.zIndex = 0;
     const spriteFront = new Sprite(textureClassRoomFront);
-    app.stage.addChild(spriteBack);
-    app.stage.addChild(spriteFront);
+    spriteFront.zIndex = 2;
+
+    this.addObjectToScene(spriteBack);
+    this.addObjectToScene(spriteFront);
   }
 }
