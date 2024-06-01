@@ -13,6 +13,7 @@ import { DDTransformComponent } from './components/transform';
 import { DDSpriteComponent } from './components/sprite';
 import { DDPhysicsComponent } from './components/physics';
 import { VirtualCamera } from './camera';
+import { DDMovementComponent } from './components/movement';
 
 export function pixiSetTimeout({
   ticker,
@@ -127,6 +128,11 @@ export async function initApp({
     world,
   });
   entity.addComponent(physicsComponent);
+
+  const movementComponent = new DDMovementComponent({
+    entity,
+  });
+  entity.addComponent(movementComponent);
 
   transformComponent.notifyUpdate({
     source: DDTransformComponent,

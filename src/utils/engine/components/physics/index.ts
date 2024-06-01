@@ -1,7 +1,6 @@
 import { Bodies, Body, Vector, World } from 'matter-js';
 import { DDComponent } from '../base';
 import { DDEntity } from '../../entity';
-import { DDTransformComponent } from '../transform';
 
 export class DDPhysicsComponent extends DDComponent {
   body: Body;
@@ -24,21 +23,17 @@ export class DDPhysicsComponent extends DDComponent {
   }
 
   get entityPosition() {
-    const transformComp = this.entity.getComponent(
-      DDTransformComponent,
-    );
+    const transformComp = this.getTransformComp();
     if (!transformComp) {
       throw new Error('transformComponent is undefined!');
     }
     return transformComp.position;
   }
 
-  initListeners() {
-    const transformComp = this.entity.getComponent(
-      DDTransformComponent,
-    );
+  override initListeners(): boolean {
+    const transformComp = this.getTransformComp();
     if (!transformComp) {
-      return;
+      return false;
     }
     transformComp.reigsterUpdateNotifyCb(
       ({ position, rotation }, source) => {
@@ -49,12 +44,11 @@ export class DDPhysicsComponent extends DDComponent {
         Body.setAngle(this.body, rotation);
       },
     );
+    return true;
   }
 
   update(_delta: number): void {
-    const transformComp = this.entity.getComponent(
-      DDTransformComponent,
-    );
+    const transformComp = this.getTransformComp();
     if (!transformComp) {
       return;
     }

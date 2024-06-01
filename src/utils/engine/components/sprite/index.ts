@@ -1,7 +1,6 @@
 import { Container, Sprite, Texture } from 'pixi.js';
 import { DDComponent } from '../base';
 import { DDEntity } from '../../entity';
-import { DDTransformComponent } from '../transform';
 
 export class DDSpriteComponent extends DDComponent {
   sprite: Sprite;
@@ -26,10 +25,8 @@ export class DDSpriteComponent extends DDComponent {
     this.initListeners();
   }
 
-  initListeners(): boolean {
-    const transformComp = this.entity.getComponent(
-      DDTransformComponent,
-    );
+  override initListeners(): boolean {
+    const transformComp = this.getTransformComp();
     if (!transformComp) {
       return false;
     }
