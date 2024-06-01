@@ -9,9 +9,9 @@ import machi_chann_idle_00 from 'config/public/images/characters/machi_chann/idl
 import classroom_back from 'config/public/images/maps/classroom/classroom_back.png';
 import classroom_front from 'config/public/images/maps/classroom/classroom_front.png';
 import { DDEntityManager } from './entity';
-import { DDTransformComponent } from './transform';
-import { DDSpriteComponent } from './sprite';
-import { DDPhysicsComponent } from './physics';
+import { DDTransformComponent } from './components/transform';
+import { DDSpriteComponent } from './components/sprite';
+import { DDPhysicsComponent } from './components/physics';
 import { VirtualCamera } from './camera';
 
 export function pixiSetTimeout({
@@ -160,7 +160,7 @@ export async function initApp({
   window.camera = camera;
 
   app.render();
-
+  app.ticker.start();
   app.ticker.add(ticker => {
     camera.update();
     Engine.update(physicsEngine, ticker.deltaMS);

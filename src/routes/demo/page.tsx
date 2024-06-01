@@ -3,8 +3,8 @@ import { Application } from 'pixi.js';
 import { useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import styles from './index.module.scss';
-import { DDEntityManager } from '@/utils/engine/entity';
-import { DDTransformComponent } from '@/utils/engine/transform';
+import { DDEntityManager } from '@/utils/engine/components/entity';
+import { DDTransformComponent } from '@/utils/engine/components/transform';
 import { initApp } from '@/utils/engine';
 
 const Index = () => {

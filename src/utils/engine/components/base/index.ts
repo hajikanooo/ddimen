@@ -1,4 +1,4 @@
-import { DDEntity } from '../entity';
+import { DDEntity } from '../../entity';
 
 export class DDComponent {
   entity: DDEntity;

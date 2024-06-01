@@ -1,6 +1,6 @@
 import { Container, Sprite, Texture } from 'pixi.js';
-import { DDComponent } from '../component';
-import { DDEntity } from '../entity';
+import { DDComponent } from '../base';
+import { DDEntity } from '../../entity';
 import { DDTransformComponent } from '../transform';
 
 export class DDSpriteComponent extends DDComponent {

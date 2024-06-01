@@ -1,7 +1,7 @@
 import { Vector } from 'matter-js';
 import { Point } from 'pixi.js';
-import { DDComponent } from '../component';
-import { DDEntity } from '../entity';
+import { DDComponent } from '../base';
+import { DDEntity } from '../../entity';
 import { DDSpriteComponent } from '../sprite';
 
 type TransformUpdateCallback<

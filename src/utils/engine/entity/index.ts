@@ -1,5 +1,5 @@
 import { Application } from 'pixi.js';
-import { DDComponent } from '../component';
+import { DDComponent } from '../components/base';
 
 export class DDEntity {
   components: DDComponent[];
