@@ -3,6 +3,13 @@ import { DDEntity } from '../../entity';
 import { DDComponent } from '../base';
 
 export class DDMovementComponent extends DDComponent {
+  static KEY_SETS: Set<string> = new Set([
+    'w',
+    's',
+    'a',
+    'd',
+  ]);
+
   keyDownSet: Set<string> = new Set();
 
   baseSpeed: number = 1;
@@ -23,18 +30,21 @@ export class DDMovementComponent extends DDComponent {
 
   onKeyDown = (e: KeyboardEvent) => {
     const { keyDownSet } = this;
-    keyDownSet.add(e.key.toLowerCase());
+    const key = e.key.toLowerCase();
+    if (DDMovementComponent.KEY_SETS.has(key)) {
+      keyDownSet.add(key);
+    }
     if (e.shiftKey) {
-      keyDownSet.add('shift');
+      this.running = !this.running;
     }
     return this;
   };
 
   onKeyUp = (e: KeyboardEvent) => {
     const { keyDownSet } = this;
-    keyDownSet.delete(e.key.toLowerCase());
-    if (e.shiftKey) {
-      keyDownSet.delete('shift');
+    const key = e.key.toLowerCase();
+    if (DDMovementComponent.KEY_SETS.has(key)) {
+      keyDownSet.delete(key);
     }
     return this;
   };
@@ -59,7 +69,7 @@ export class DDMovementComponent extends DDComponent {
   get speed(): number {
     const { baseSpeed, runningScale } = this;
     let speed = baseSpeed;
-    if (this.isKeyPressed('shift')) {
+    if (this.running) {
       speed *= runningScale;
     }
     return speed;
