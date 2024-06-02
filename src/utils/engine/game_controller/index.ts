@@ -16,7 +16,11 @@ import { DDSpriteComponent } from '../components/sprite';
 import { DDPhysicsComponent } from '../components/physics';
 import { DDMovementComponent } from '../components/movement';
 import { IDDControllerHooks } from './typing';
-import { MAIN_CAMEAR_LABEL } from './constants';
+import {
+  MAIN_CAMEAR_LABEL,
+  MAIN_GRID_LABEL,
+} from './constants';
+import { DDGrid } from '@/utils/graphics/dd_grid';
 
 export class DDGameController {
   ctn: HTMLElement;
@@ -67,6 +71,7 @@ export class DDGameController {
 
   async init(): Promise<DDGameController> {
     await this.initApp();
+    await this.initGrid();
     return this;
   }
 
@@ -90,6 +95,39 @@ export class DDGameController {
     hooks?.afterDestroy?.({ controller: this });
 
     return this;
+  }
+
+  async initGrid(): Promise<DDGameController> {
+    // 创建PixiJS应用
+    const { mainCamera, app } = this;
+    const { viewport } = mainCamera;
+
+    const grid = new DDGrid({
+      parent: viewport,
+      gridWidth: app.screen.width * 2,
+      gridHeight: app.screen.height * 2,
+      cellWidth: 32,
+      lineWidth: 0,
+    });
+    grid.container.label = MAIN_GRID_LABEL;
+    this.addEntity({ entity: grid });
+
+    // 添加图形到应用中
+    grid.generate().draw();
+
+    return this;
+  }
+
+  getWorldPosition({
+    screenPosition,
+  }: {
+    screenPosition: Vector;
+  }): Vector {
+    const { viewport } = this.mainCamera;
+    return Vector.create(
+      screenPosition.x - viewport.x,
+      screenPosition.y - viewport.y,
+    );
   }
 
   start() {
@@ -145,10 +183,37 @@ export class DDGameController {
     mainCamera.viewport.addChild(sprite);
   }
 
-  async addPlayer(): Promise<DDEntity> {
-    const { entityManager, app, physicsEngine } = this;
+  initEntity({
+    entity,
+  }: {
+    entity: DDEntity;
+  }): DDGameController {
+    entity.controller = this;
+    return this;
+  }
 
-    const entity = entityManager.createEntity({ app });
+  createEntity(): DDEntity {
+    const { entityManager } = this;
+    const entity = entityManager.createEntity();
+    this.initEntity({ entity });
+    return entity;
+  }
+
+  addEntity({
+    entity,
+  }: {
+    entity: DDEntity;
+  }): DDGameController {
+    const { entityManager } = this;
+    entityManager.addEntity({ entity });
+    this.initEntity({ entity });
+    return this;
+  }
+
+  async addPlayer(): Promise<DDEntity> {
+    const { app, physicsEngine } = this;
+
+    const entity = this.createEntity();
     const initPosition = Vector.create(
       app.screen.width / 2,
       app.screen.height / 2,

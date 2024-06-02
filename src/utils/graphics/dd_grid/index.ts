@@ -1,5 +1,7 @@
 import { Container, Graphics } from 'pixi.js';
-import { DDGameController } from '@/utils/engine/game_controller';
+import { Vector } from 'matter-js';
+import { DDEntity } from '@/utils/engine/entity';
+import { DDTransformComponent } from '@/utils/engine/components/transform';
 
 interface GridTile {
   row: number;
@@ -14,8 +16,8 @@ interface GridHooks {
   handleClickTile?: (params: { tile: GridTile }) => void;
 }
 
-export class DDGrid {
-  controller: DDGameController;
+export class DDGrid extends DDEntity {
+  parent: Container;
 
   container: Container = new Container();
 
@@ -24,6 +26,8 @@ export class DDGrid {
   gridHeight: number;
 
   lineWidth: number;
+
+  zIndex: number;
 
   rows: number;
 
@@ -42,20 +46,23 @@ export class DDGrid {
   hooks: GridHooks = {};
 
   constructor({
-    controller,
+    parent,
     gridWidth,
     gridHeight,
     cellWidth,
     lineWidth,
+    zIndex = 10,
     hooks = {},
   }: {
-    controller: DDGameController;
+    parent: Container;
     gridWidth: number;
     gridHeight: number;
     cellWidth: number;
     lineWidth: number;
+    zIndex?: number;
     hooks?: GridHooks;
   }) {
+    super();
     const cols = Math.floor(
       (gridWidth + lineWidth) / (cellWidth + lineWidth),
     );
@@ -67,10 +74,13 @@ export class DDGrid {
     const actualCellHeight =
       (gridHeight - (rows + 1) * lineWidth) / rows;
 
-    this.controller = controller;
+    this.container.zIndex = zIndex;
+
+    this.parent = parent;
     this.gridWidth = gridWidth;
     this.gridHeight = gridHeight;
     this.lineWidth = lineWidth;
+    this.zIndex = zIndex;
     this.rows = rows;
     this.cols = cols;
     this.actualCellWidth = actualCellWidth;
@@ -80,21 +90,42 @@ export class DDGrid {
     this.initEventListeners();
   }
 
+  initComponents() {
+    const transformComp = new DDTransformComponent({
+      entity: this,
+      x: 0,
+      y: 0,
+    });
+    this.addComponent(transformComp);
+  }
+
   initEventListeners() {
-    const { controller } = this;
-    controller.app.stage.on('pointerdown', e => {
-      const { global } = e;
-      const { x, y } = global;
-      const tile = this.getTileByCoordinate({ x, y });
-      if (!tile) {
+    const { parent } = this;
+    parent.eventMode = 'static';
+    parent.cursor = 'pointer';
+    // parent.on('pointerdown', e => {
+    //   const { controller } = this;
+    //   if (!controller) {
+    //     return;
+    //   }
+    //   const { global } = e;
+    //   const { x, y } = global;
+    //   const tile = this.getTileByCoordinate({ x, y });
+    //   if (!tile) {
+    //     return;
+    //   }
+    //   this.activateTile({ tile });
+    //   this.hooks.handleClickTile?.({ tile });
+    // });
+    parent.on('pointermove', e => {
+      const { controller } = this;
+      if (!controller) {
         return;
       }
-      this.activateTile({ tile });
-      this.hooks.handleClickTile?.({ tile });
-    });
-    controller.app.stage.on('pointermove', e => {
       const { global } = e;
-      const { x, y } = global;
+      const { x, y } = controller.getWorldPosition({
+        screenPosition: Vector.create(global.x, global.y),
+      });
       const tile = this.getTileByCoordinate({ x, y });
       if (!tile) {
         return;
@@ -157,7 +188,9 @@ export class DDGrid {
       }
     }
 
-    graphics.stroke();
+    graphics.stroke({
+      alpha: 0.5,
+    });
 
     this.graphics = graphics;
     this.tiles = tiles;
@@ -198,8 +231,8 @@ export class DDGrid {
     }
   }
 
-  draw({ parent }: { parent: Container }) {
-    const { container, graphics } = this;
+  draw() {
+    const { parent, container, graphics } = this;
     container.addChild(graphics);
     parent.addChild(container);
   }

@@ -42,7 +42,7 @@ export class DDTransformComponent extends DDComponent {
     this.updateCallbacks = [];
   }
 
-  get screenPostion(): Vector {
+  get screenPosition(): Vector {
     const spriteComp = this.entity.getComponent(
       DDSpriteComponent,
     );
@@ -54,11 +54,18 @@ export class DDTransformComponent extends DDComponent {
   }
 
   get worldPosition(): Vector {
-    const { entity, screenPostion } = this;
-    const { app } = entity;
-    return Vector.create(
-      screenPostion.x - app.stage.x,
-      screenPostion.y - app.stage.y,
+    const { screenPosition, entity } = this;
+    const { controller } = entity;
+    if (!controller) {
+      return Vector.create(
+        screenPosition.x,
+        screenPosition.y,
+      );
+    }
+    return Vector.clone(
+      controller.getWorldPosition({
+        screenPosition,
+      }),
     );
   }
 

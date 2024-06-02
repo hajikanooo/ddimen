@@ -1,14 +1,13 @@
-import { Application } from 'pixi.js';
 import { DDComponent } from '../components/base';
+import { DDGameController } from '../game_controller';
 
 export class DDEntity {
   components: DDComponent[];
 
-  app: Application;
+  controller: DDGameController | null = null;
 
-  constructor({ app }: { app: Application }) {
+  constructor() {
     this.components = [];
-    this.app = app;
   }
 
   addComponent(component: DDComponent): void {
@@ -47,8 +46,13 @@ export class DDEntityManager {
     this.entities = [];
   }
 
-  createEntity({ app }: { app: Application }): DDEntity {
-    const entity = new DDEntity({ app });
+  createEntity(): DDEntity {
+    const entity = new DDEntity();
+    this.entities.push(entity);
+    return entity;
+  }
+
+  addEntity({ entity }: { entity: DDEntity }): DDEntity {
     this.entities.push(entity);
     return entity;
   }

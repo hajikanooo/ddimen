@@ -64,11 +64,11 @@ export class VirtualCamera {
       return;
     }
     const targetX =
-      transformComp.screenPostion.x +
+      transformComp.screenPosition.x +
       this.offsetX -
       this.app.screen.width / 2;
     const targetY =
-      transformComp.screenPostion.y +
+      transformComp.screenPosition.y +
       this.offsetY -
       this.app.screen.height / 2;
 
