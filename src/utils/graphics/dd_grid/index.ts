@@ -1,9 +1,8 @@
 import { Container, Graphics } from 'pixi.js';
 import { Vector } from 'matter-js';
 import { DDEntity } from '@/utils/engine/entity';
-import { DDTransformComponent } from '@/utils/engine/components/transform';
 
-interface GridTile {
+export interface GridTile {
   row: number;
   col: number;
   xStart: number;
@@ -90,33 +89,30 @@ export class DDGrid extends DDEntity {
     this.initEventListeners();
   }
 
-  initComponents() {
-    const transformComp = new DDTransformComponent({
-      entity: this,
-      x: 0,
-      y: 0,
-    });
-    this.addComponent(transformComp);
-  }
-
   initEventListeners() {
     const { parent } = this;
     parent.eventMode = 'static';
     parent.cursor = 'pointer';
-    // parent.on('pointerdown', e => {
-    //   const { controller } = this;
-    //   if (!controller) {
-    //     return;
-    //   }
-    //   const { global } = e;
-    //   const { x, y } = global;
-    //   const tile = this.getTileByCoordinate({ x, y });
-    //   if (!tile) {
-    //     return;
-    //   }
-    //   this.activateTile({ tile });
-    //   this.hooks.handleClickTile?.({ tile });
-    // });
+    parent.on('pointerdown', e => {
+      const { controller } = this;
+      if (!controller) {
+        return;
+      }
+      const { global } = e;
+      const { x, y } = controller.getWorldPosition({
+        screenPosition: Vector.create(global.x, global.y),
+      });
+      const tile = this.getTileByCoordinate({ x, y });
+      if (!tile) {
+        return;
+      }
+      console.log(
+        '🚀 ~ DDGrid ~ initEventListeners ~ tile:',
+        tile,
+      );
+      // this.activateTile({ tile });
+      this.hooks.handleClickTile?.({ tile });
+    });
     parent.on('pointermove', e => {
       const { controller } = this;
       if (!controller) {

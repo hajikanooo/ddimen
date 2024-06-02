@@ -26,6 +26,9 @@ dependencies:
   classnames:
     specifier: ^2.5.1
     version: 2.5.1
+  eventemitter3:
+    specifier: ^5.0.1
+    version: 5.0.1
   framer-motion:
     specifier: ^11.2.6
     version: 11.2.6(react-dom@18.2.0)(react@18.2.0)

@@ -1,6 +1,7 @@
 import { Vector } from 'matter-js';
 import { DDEntity } from '../../entity';
 import { DDComponent } from '../base';
+import { DDSpriteComponent } from '../sprite';
 
 export class DDMovementComponent extends DDComponent {
   static KEY_SETS: Set<string> = new Set([
@@ -14,7 +15,7 @@ export class DDMovementComponent extends DDComponent {
 
   specialKeyDownSet: Set<string> = new Set();
 
-  baseSpeed: number = 1;
+  baseSpeed: number = 1.5;
 
   running: boolean = false;
 
@@ -107,16 +108,17 @@ export class DDMovementComponent extends DDComponent {
     if (!magnitude) {
       return;
     }
-    const transformComp = this.getTransformComp();
-    if (!transformComp) {
-      return;
-    }
-    const { position } = transformComp;
-    const newPos = Vector.add(
-      position,
-      Vector.mult(direction, speed),
+    const spriteComp = this.entity.getComponent(
+      DDSpriteComponent,
     );
-    transformComp.setPosition(newPos);
+    if (spriteComp) {
+      const { x, y } = spriteComp.sprite;
+      const newPos = Vector.add(
+        Vector.create(x, y),
+        Vector.mult(direction, speed),
+      );
+      spriteComp.setPosition(newPos);
+    }
   }
 
   update(_delta: number): void {

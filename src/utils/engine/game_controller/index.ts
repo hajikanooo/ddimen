@@ -9,17 +9,14 @@ import { Engine, Vector } from 'matter-js';
 import machi_chann_idle_00 from 'config/public/images/characters/machi_chann/idle_00.png';
 import classroom_back from 'config/public/images/maps/classroom/classroom_back.png';
 import classroom_front from 'config/public/images/maps/classroom/classroom_front.png';
+import { MAIN_CAMEAR_LABEL, MAIN_GRID_LABEL } from 'shared';
+import { MAIN_PLAYER_LABEL } from '@shared/labels';
 import { DDEntity, DDEntityManager } from '../entity';
 import { VirtualCamera } from '../camera';
-import { DDTransformComponent } from '../components/transform';
 import { DDSpriteComponent } from '../components/sprite';
 import { DDPhysicsComponent } from '../components/physics';
 import { DDMovementComponent } from '../components/movement';
 import { IDDControllerHooks } from './typing';
-import {
-  MAIN_CAMEAR_LABEL,
-  MAIN_GRID_LABEL,
-} from './constants';
 import { DDGrid } from '@/utils/graphics/dd_grid';
 
 export class DDGameController {
@@ -36,6 +33,8 @@ export class DDGameController {
   physicsEngine: Engine;
 
   mainCamera: VirtualCamera;
+
+  started: boolean = false;
 
   constructor({
     ctn,
@@ -134,6 +133,7 @@ export class DDGameController {
     const { app } = this;
     app.render();
     app.start();
+    this.started = true;
   }
 
   update(ticker: Ticker) {
@@ -148,11 +148,13 @@ export class DDGameController {
     if (process.env.NODE_ENV !== 'development') {
       return;
     }
-    const { app, mainCamera } = this;
+    const { app, mainCamera, entityManager } = this;
     // @ts-expect-error
     window.app = app;
     // @ts-expect-error __PIXI_APP__
     window.__PIXI_APP__ = app;
+    // @ts-expect-error
+    window.entityManager = entityManager;
     // @ts-expect-error
     window.mainCamera = mainCamera;
   }
@@ -179,8 +181,9 @@ export class DDGameController {
   }
 
   addObjectToScene(sprite: Sprite) {
-    const { mainCamera } = this;
+    const { mainCamera, app } = this;
     mainCamera.viewport.addChild(sprite);
+    app.render();
   }
 
   initEntity({
@@ -214,22 +217,6 @@ export class DDGameController {
     const { app, physicsEngine } = this;
 
     const entity = this.createEntity();
-    const initPosition = Vector.create(
-      app.screen.width / 2,
-      app.screen.height / 2,
-    );
-
-    const transformComponent = new DDTransformComponent({
-      entity,
-      x: initPosition.x,
-      y: initPosition.y,
-    });
-    const scale = 0.35;
-    transformComponent.setScale({
-      scaleX: scale,
-      scaleY: scale,
-    });
-    entity.addComponent(transformComponent);
 
     const texture = await Assets.load(machi_chann_idle_00);
     const spriteComponent = new DDSpriteComponent({
@@ -240,9 +227,21 @@ export class DDGameController {
         cursor: 'pointer',
       },
     });
+    const initPosition = Vector.create(
+      app.screen.width / 2,
+      app.screen.height / 2,
+    );
+    spriteComponent.setPosition(initPosition);
+    spriteComponent.setScale({
+      scaleX: 0.35,
+      scaleY: 0.35,
+    });
     spriteComponent.sprite.anchor.set(0.5);
     spriteComponent.sprite.zIndex = 1;
+    spriteComponent.sprite.label = MAIN_PLAYER_LABEL;
     entity.addComponent(spriteComponent);
+    this.setMainCameraFollow({ entity });
+    this.addObjectToScene(spriteComponent.sprite);
 
     const physicsComponent = new DDPhysicsComponent({
       entity,
@@ -254,12 +253,6 @@ export class DDGameController {
       entity,
     });
     entity.addComponent(movementComponent);
-
-    transformComponent.notifyUpdate({
-      source: DDTransformComponent,
-    });
-
-    this.addObjectToScene(spriteComponent.sprite);
 
     return entity;
   }

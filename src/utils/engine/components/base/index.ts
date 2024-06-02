@@ -1,5 +1,5 @@
 import { DDEntity } from '../../entity';
-import { DDTransformComponent } from '../transform';
+import { DDSpriteComponent } from '../sprite';
 
 export class DDComponent {
   entity: DDEntity;
@@ -17,11 +17,11 @@ export class DDComponent {
     this.enabled = enabled;
   }
 
-  getTransformComp() {
-    const transformComp = this.entity.getComponent(
-      DDTransformComponent,
+  getSpriteComponent() {
+    const spriteComp = this.entity.getComponent(
+      DDSpriteComponent,
     );
-    return transformComp;
+    return spriteComp;
   }
 
   update(_delta: number): void {

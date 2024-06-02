@@ -8,7 +8,7 @@ export class DDPhysicsComponent extends DDComponent {
   constructor({
     entity,
     world,
-    size = Vector.create(50, 50),
+    size = Vector.create(32, 64),
   }: {
     entity: DDEntity;
     world: World;
@@ -23,43 +23,37 @@ export class DDPhysicsComponent extends DDComponent {
   }
 
   get entityPosition() {
-    const transformComp = this.getTransformComp();
-    if (!transformComp) {
-      throw new Error('transformComponent is undefined!');
+    const spriteComp = this.getSpriteComponent();
+    if (!spriteComp) {
+      throw new Error('spriteComponent is undefined!');
     }
-    return transformComp.position;
+    return spriteComp.worldPosition;
   }
 
   override initListeners(): boolean {
-    const transformComp = this.getTransformComp();
-    if (!transformComp) {
-      return false;
-    }
-    transformComp.reigsterUpdateNotifyCb(
-      ({ position, rotation }, source) => {
-        if (source instanceof DDPhysicsComponent) {
-          return;
-        }
-        Body.setPosition(this.body, position);
-        Body.setAngle(this.body, rotation);
-      },
-    );
     return true;
   }
 
+  setPosition(pos: Vector): void {
+    Body.setPosition(this.body, pos);
+    Body.setSpeed(this.body, 0);
+  }
+
+  setRotation({ rotation }: { rotation: number }): void {
+    this.body.angle = rotation;
+  }
+
   update(_delta: number): void {
-    const transformComp = this.getTransformComp();
-    if (!transformComp) {
+    const spriteComp = this.getSpriteComponent();
+    if (!spriteComp) {
       return;
     }
-    transformComp.setPosition({
+    spriteComp.setPosition({
       x: this.body.position.x,
       y: this.body.position.y,
-      source: DDPhysicsComponent,
     });
-    transformComp.setRotation({
+    spriteComp.setRotation({
       rotation: this.body.angle,
-      source: DDPhysicsComponent,
     });
   }
 }

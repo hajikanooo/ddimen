@@ -1,6 +1,6 @@
 import { Application, Container } from 'pixi.js';
 import { DDEntity } from '../entity';
-import { DDTransformComponent } from '../components/transform';
+import { DDSpriteComponent } from '../components/sprite';
 
 export function isSameDir(
   num1: number,
@@ -57,18 +57,19 @@ export class VirtualCamera {
     if (!this.followTarget) {
       return;
     }
-    const transformComp = this.followTarget.getComponent(
-      DDTransformComponent,
+    const spriteComp = this.followTarget.getComponent(
+      DDSpriteComponent,
     );
-    if (!transformComp) {
+    if (!spriteComp) {
       return;
     }
+    const { screenPosition } = spriteComp;
     const targetX =
-      transformComp.screenPosition.x +
+      screenPosition.x +
       this.offsetX -
       this.app.screen.width / 2;
     const targetY =
-      transformComp.screenPosition.y +
+      screenPosition.y +
       this.offsetY -
       this.app.screen.height / 2;
 
