@@ -1,14 +1,11 @@
 import { Container, Graphics } from 'pixi.js';
 import { Vector } from 'matter-js';
+import { DDTile } from '@shared/typing';
 import { DDEntity } from '@/utils/engine/entity';
 
-export interface GridTile {
+export interface GridTile extends DDTile {
   row: number;
   col: number;
-  xStart: number;
-  xEnd: number;
-  yStart: number;
-  yEnd: number;
 }
 
 interface GridHooks {

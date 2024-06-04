@@ -2,22 +2,22 @@ import {
   Application,
   ApplicationOptions,
   Assets,
-  Sprite,
+  Container,
   Ticker,
 } from 'pixi.js';
 import { Engine, Vector } from 'matter-js';
 import machi_chann_idle_00 from 'config/public/images/characters/machi_chann/idle_00.png';
-import classroom_back from 'config/public/images/maps/classroom/classroom_back.png';
-import classroom_front from 'config/public/images/maps/classroom/classroom_front.png';
 import { MAIN_CAMEAR_LABEL, MAIN_GRID_LABEL } from 'shared';
 import { MAIN_PLAYER_LABEL } from '@shared/labels';
+import { LayerOrder } from '@shared/layer_order';
 import { DDEntity, DDEntityManager } from '../entity';
 import { VirtualCamera } from '../camera';
 import { DDSpriteComponent } from '../components/sprite';
 import { DDPhysicsComponent } from '../components/physics';
 import { DDMovementComponent } from '../components/movement';
 import { IDDControllerHooks } from './typing';
-import { DDGrid } from '@/utils/graphics/dd_grid';
+import { DDGrid } from '@/utils/engine/entity/dd_grid';
+import { DDClassRoomMap } from '@/data/maps/classroom';
 
 export class DDGameController {
   ctn: HTMLElement;
@@ -180,9 +180,9 @@ export class DDGameController {
     return this;
   }
 
-  addObjectToScene(sprite: Sprite) {
+  addObjectToScene(ctn: Container) {
     const { mainCamera, app } = this;
-    mainCamera.viewport.addChild(sprite);
+    mainCamera.viewport.addChild(ctn);
     app.render();
   }
 
@@ -237,7 +237,7 @@ export class DDGameController {
       scaleY: 0.35,
     });
     spriteComponent.sprite.anchor.set(0.5);
-    spriteComponent.sprite.zIndex = 1;
+    spriteComponent.sprite.zIndex = LayerOrder.INSTANCE_00;
     spriteComponent.sprite.label = MAIN_PLAYER_LABEL;
     entity.addComponent(spriteComponent);
     this.setMainCameraFollow({ entity });
@@ -258,18 +258,8 @@ export class DDGameController {
   }
 
   async addBackground(): Promise<void> {
-    const textureClassRoomBack = await Assets.load(
-      classroom_back,
-    );
-    const textureClassRoomFront = await Assets.load(
-      classroom_front,
-    );
-    const spriteBack = new Sprite(textureClassRoomBack);
-    spriteBack.zIndex = 0;
-    const spriteFront = new Sprite(textureClassRoomFront);
-    spriteFront.zIndex = 2;
-
-    this.addObjectToScene(spriteBack);
-    this.addObjectToScene(spriteFront);
+    const map = new DDClassRoomMap({ controller: this });
+    this.addEntity({ entity: map });
+    await map.load();
   }
 }

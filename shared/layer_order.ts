@@ -1,0 +1,18 @@
+export enum LayerOrder {
+  BACK_00 = 0,
+  BACK_01,
+  BACK_02,
+  BACK_03,
+  BACK_04,
+  INSTANCE_00,
+  INSTANCE_01,
+  INSTANCE_02,
+  INSTANCE_03,
+  INSTANCE_04,
+  FRONT_00,
+  FRONT_01,
+  FRONT_02,
+  FRONT_03,
+  FRONT_04,
+  AIR_WALL,
+}
