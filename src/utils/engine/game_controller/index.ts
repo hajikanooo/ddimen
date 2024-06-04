@@ -19,6 +19,14 @@ import { IDDControllerHooks } from './typing';
 import { DDGrid } from '@/utils/engine/entity/dd_grid';
 import { DDClassRoomMap } from '@/data/maps/classroom';
 
+// TODO
+// 1. DDGameController 的功能太杂了 考虑拆分
+// 2. DDEntityManager 需要管理哪些 Entity？哪些需要成为 Entity ？
+// 3. Entity 有什么不依赖 DDGameController 的方法？ 现在会有循环依赖
+// 4. 实现一个 SceneManager 支持动态加载区块 区块内部加载若干个地图
+// 5. 空气墙支持位图形式上传 支持动态增删改空气墙
+// 6. 动画系统的支持
+// 7. GUI系统的支持
 export class DDGameController {
   ctn: HTMLElement;
 
